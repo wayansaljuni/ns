@@ -83,7 +83,7 @@ class ActivitiResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $user = Auth::user();
-        return parent::getEloquentQuery()->where('nik','like', "%$user->nik%");
+        return parent::getEloquentQuery()->where('nik','like', "$user->nik%");
     }
 
     public static function mutateFormDataBeforeCreate(array $data): array
@@ -580,6 +580,11 @@ class ActivitiResource extends Resource
                     ->label('Tanggal Pulang')
                     ->dateTime()
                     ->sortable(),
+                TextColumn::make('updated_at')
+                    ->label('Entry Date')
+                    ->dateTime()
+                    ->sortable(),
+
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -590,7 +595,7 @@ class ActivitiResource extends Resource
                         'Closed' => 'Closed',
                     ]),
                     
-                Tables\Filters\Filter::make('tanggal_datang')
+                Tables\Filters\Filter::make('updated_at')
                     ->form([
                         Forms\Components\DatePicker::make('tanggal_dari')
                             ->label('Dari Tanggal'),
@@ -601,11 +606,11 @@ class ActivitiResource extends Resource
                         return $query
                             ->when(
                                 $data['tanggal_dari'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('tanggal_datang', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
                             )
                             ->when(
                                 $data['tanggal_sampai'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('tanggal_datang', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('updated_at', '<=', $date),
                             );
                     }),
             ])

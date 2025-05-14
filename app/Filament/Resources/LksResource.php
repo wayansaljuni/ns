@@ -69,17 +69,17 @@ class LksResource extends Resource
     }
 
    
-    // public static function mutateFormDataBeforeCreate(array $data): array
-    // {
-    //     // $data['user_id'] = auth()->id(); // otomatis isi user_id
-    //     // return $data;
-    //     $data['user_id'] = Auth::user()->id;
-    //     return $data;
-    // }
+    public static function mutateFormDataBeforeCreate(array $data): array
+    {
+        // $data['user_id'] = auth()->id(); // otomatis isi user_id
+        // return $data;
+        $data['user_id'] = Auth::user()->id;
+        return $data;
+    }
     public static function canAccess(): bool
     {
         // dd(auth()->user()?->hasRole('admin'));
-        return auth()->user()?->hasRole(['admin','lks']); // atau yang boleh saja
+        return auth()->user()?->hasRole(['super_admin','lks']); // atau yang boleh saja
         // return auth()->user()->can('view lks');
     }
     public static function canEdit(Model $record): bool

@@ -23,7 +23,6 @@ class User extends Authenticatable
         'nik',
         'kdcab',
         'password',
-        'roles_id',
     ];
 
     /**

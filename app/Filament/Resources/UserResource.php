@@ -31,8 +31,9 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $user = Auth::user();
+        // dd(Auth::user());
         // if (!auth()->user()?->hasRole('teknisi')) {
-            return parent::getEloquentQuery()->where('nik','like', "%$user->nik%");
+            return parent::getEloquentQuery()->where('nik','like', "$user->nik%");
         // }
     }
 
@@ -65,11 +66,11 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->label('User Name')->searchable(),
-                TextColumn::make('email')->searchable(),
-                TextColumn::make('roles.name')->searchable(),
-                TextColumn::make('nik'),
-                TextColumn::make('kdcab')->label('Cabang'),               
+                TextColumn::make('name')->label('User Name')->sortable()->searchable(),
+                TextColumn::make('email')->sortable()->searchable(),
+                TextColumn::make('roles.name')->sortable()->searchable(),
+                TextColumn::make('nik')->label('Nik')->sortable()->searchable(),
+                TextColumn::make('kdcab')->label('Cabang')->sortable()->searchable(),               
             ])
             ->filters([
                 //
