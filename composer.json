@@ -9,6 +9,7 @@
         "bezhansalleh/filament-shield": "^3.3",
         "filament/filament": "3.3",
         "intervention/image": "2.7",
+        "joshembling/image-optimizer": "^1.6",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^3.1",

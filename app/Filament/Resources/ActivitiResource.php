@@ -300,84 +300,88 @@ class ActivitiResource extends Resource
                 FileUpload::make('foto_produk')
                     ->label('Foto Produk-1')
                     ->image()
-                    ->maxSize(3000) // Maksimal 3MB per file
+                    ->maxSize(15000) // Maksimal 3MB per file
                     ->directory('spk-activities/photos')
-                    ->preserveFilenames()
-                    ->afterStateUpdated(function ($state) {
-                        if (!$state) return;
-                        $path = storage_path('app/public/' . $state);
-                        if (!file_exists($path)) {
-                            logger("File not found at: " . $path);
-                            return;
-                        }
-                        if ($state) {
-                            $path = storage_path('app/public/' . $state);
-                            // Resize pakai Intervention Image
-                            $image = Image::make($path)
-                                ->resize(800, null, function ($constraint) {
-                                    $constraint->aspectRatio();
-                                    $constraint->upsize();
-                                })
-                                ->encode('jpg', 80); // Kompres kualitas
-                            $image->save($path); // Simpan hasil resize
-                            // Optimasi pakai Spatie Image Optimizer
-                            ImageOptimizer::optimize($path);
-                        }
-                    }),
+                    ->resize(50),
+
+                    // ->preserveFilenames()
+                    // ->afterStateUpdated(function ($state) {
+                    //     if (!$state) return;
+                    //     $path = storage_path('app/public/' . $state);
+                    //     if (!file_exists($path)) {
+                    //         logger("File not found at: " . $path);
+                    //         return;
+                    //     }
+                    //     if ($state) {
+                    //         $path = storage_path('app/public/' . $state);
+                    //         // Resize pakai Intervention Image
+                    //         $image = Image::make($path)
+                    //             ->resize(800, null, function ($constraint) {
+                    //                 $constraint->aspectRatio();
+                    //                 $constraint->upsize();
+                    //             })
+                    //             ->encode('jpg', 80); // Kompres kualitas
+                    //         $image->save($path); // Simpan hasil resize
+                    //         // Optimasi pakai Spatie Image Optimizer
+                    //         ImageOptimizer::optimize($path);
+                    //     }
+                    // }),
                 FileUpload::make('foto_produk2')
                     ->label('Foto Produk-2')
                     ->image()
-                    ->maxSize(3000) // Maksimal 3MB per file
+                    ->maxSize(15000) // Maksimal 3MB per file
                     ->directory('spk-activities/photos')
-                    ->preserveFilenames()
-                    ->afterStateUpdated(function ($state) {
-                        if (!$state) return;
-                        $path = storage_path('app/public/' . $state);
-                        if (!file_exists($path)) {
-                            logger("File not found at: " . $path);
-                            return;
-                        }
-                        if ($state) {
-                            $path = storage_path('app/public/' . $state);
-                            // Resize pakai Intervention Image
-                            $image = Image::make($path)
-                                ->resize(800, null, function ($constraint) {
-                                    $constraint->aspectRatio();
-                                    $constraint->upsize();
-                                })
-                                ->encode('jpg', 80); // Kompres kualitas
-                            $image->save($path); // Simpan hasil resize
-                            // Optimasi pakai Spatie Image Optimizer
-                            ImageOptimizer::optimize($path);
-                        }
-                    }),
+                    ->resize(50),
+                    // ->preserveFilenames()
+                    // ->afterStateUpdated(function ($state) {
+                    //     if (!$state) return;
+                    //     $path = storage_path('app/public/' . $state);
+                    //     if (!file_exists($path)) {
+                    //         logger("File not found at: " . $path);
+                    //         return;
+                    //     }
+                    //     if ($state) {
+                    //         $path = storage_path('app/public/' . $state);
+                    //         // Resize pakai Intervention Image
+                    //         $image = Image::make($path)
+                    //             ->resize(800, null, function ($constraint) {
+                    //                 $constraint->aspectRatio();
+                    //                 $constraint->upsize();
+                    //             })
+                    //             ->encode('jpg', 80); // Kompres kualitas
+                    //         $image->save($path); // Simpan hasil resize
+                    //         // Optimasi pakai Spatie Image Optimizer
+                    //         ImageOptimizer::optimize($path);
+                    //     }
+                    // }),
                 FileUpload::make('foto_produk3')
                     ->label('Foto Produk-3')
                     ->image()
-                    ->maxSize(3000) // Maksimal 3MB per file
+                    ->maxSize(15000) // Maksimal 3MB per file
                     ->directory('spk-activities/photos')
-                    ->preserveFilenames()
-                    ->afterStateUpdated(function ($state) {
-                        if (!$state) return;
-                        $path = storage_path('app/public/' . $state);
-                        if (!file_exists($path)) {
-                            logger("File not found at: " . $path);
-                            return;
-                        }
-                        if ($state) {
-                            $path = storage_path('app/public/' . $state);
-                            // Resize pakai Intervention Image
-                            $image = Image::make($path)
-                                ->resize(800, null, function ($constraint) {
-                                    $constraint->aspectRatio();
-                                    $constraint->upsize();
-                                })
-                                ->encode('jpg', 80); // Kompres kualitas
-                            $image->save($path); // Simpan hasil resize
-                            // Optimasi pakai Spatie Image Optimizer
-                            ImageOptimizer::optimize($path);
-                        }
-                    }),
+                    ->resize(50),
+                    // ->preserveFilenames()
+                    // ->afterStateUpdated(function ($state) {
+                    //     if (!$state) return;
+                    //     $path = storage_path('app/public/' . $state);
+                    //     if (!file_exists($path)) {
+                    //         logger("File not found at: " . $path);
+                    //         return;
+                    //     }
+                    //     if ($state) {
+                    //         $path = storage_path('app/public/' . $state);
+                    //         // Resize pakai Intervention Image
+                    //         $image = Image::make($path)
+                    //             ->resize(800, null, function ($constraint) {
+                    //                 $constraint->aspectRatio();
+                    //                 $constraint->upsize();
+                    //             })
+                    //             ->encode('jpg', 80); // Kompres kualitas
+                    //         $image->save($path); // Simpan hasil resize
+                    //         // Optimasi pakai Spatie Image Optimizer
+                    //         ImageOptimizer::optimize($path);
+                    //     }
+                    // }),
 
                     // // ->multiple() // Mengizinkan multiple files
                     // // ->acceptedFileTypes([
