@@ -7,6 +7,7 @@ use App\Models\User;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
@@ -28,14 +29,29 @@ class UserResource extends Resource
         return 'User Management';
     }
 
-    public static function getEloquentQuery(): Builder
-    {
-        $user = Auth::user();
-        // dd(Auth::user());
-        // if (!auth()->user()?->hasRole('teknisi')) {
-            return parent::getEloquentQuery()->where('nik','like', "$user->nik%");
-        // }
+    // public static function getEloquentQuery(): Builder
+    // {
+    //     $user = Auth::user();
+    //     // dd(Auth::user());
+    //     if (!auth()->user()?->hasRole(['teknisi','admin','lks'])) {
+    //         return parent::getEloquentQuery()->where('nik','like', "%$user->nik%");
+    //     }
+    //     {
+    //         return parent::getEloquentQuery();
+    //     }
+    // }
+
+public static function getEloquentQuery(): Builder
+{
+    $user = Filament::auth()->user();
+    // Jika super_admin, tampilkan semua user
+    if ($user->hasRole(['super_admin'])) {
+        return parent::getEloquentQuery();
     }
+    // Selain super_admin, hanya tampilkan data dirinya sendiri
+    return parent::getEloquentQuery()->where('id', $user->id);
+}
+
 
     public static function getNavigationBadge(): ?string
     {

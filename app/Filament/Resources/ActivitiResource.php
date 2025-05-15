@@ -11,11 +11,13 @@ use App\Models\Teknisi;
 use App\Models\Activiti;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Facades\Filament;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Support\Exceptions\Halt;
@@ -34,16 +36,15 @@ use Filament\Tables\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\ActivitiExporter;
 use Filament\Infolists\Components\Section;
+use Filament\Tables\Enums\ActionsPosition; 
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Infolists\Components\ImageEntry;
 use App\Filament\Resources\ActivitiResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Enums\ActionsPosition; 
 use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 use App\Filament\Resources\ActivitiResource\RelationManagers;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ActivitiResource extends Resource
 {
@@ -63,7 +64,10 @@ class ActivitiResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) Activiti::where('status','<>','Closed')->count();
+        $user = Filament::auth()->user();
+        return (string) Activiti::where('status','<>','Closed')
+            ->where('nik','like',"%$user->nik%")->count();
+            // ->where('kdcab','=',"$user->kdcab")->count();
     }
     
     public static function getNavigationBadgeColor(): ?string
@@ -82,8 +86,29 @@ class ActivitiResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $user = Auth::user();
-        return parent::getEloquentQuery()->where('nik','like', "$user->nik%");
+        $user = Filament::auth()->user();
+        // Jika super_admin, tampilkan semua user
+        if ($user->hasRole(['super_admin'])) {
+            return parent::getEloquentQuery();
+        }
+        // Selain super_admin, hanya tampilkan data dirinya sendiri
+        if ($user->hasRole(['admincs'])) {
+            return parent::getEloquentQuery()
+            ->Where('kdcab','=',"$user->kdcab");
+        }
+
+        return parent::getEloquentQuery()
+            ->where('nik','like', "%$user->nik%");
+
+        // $user = Auth::user();
+        // if (!auth()->user()?->hasRole(['teknisi'])) {
+        //     return parent::getEloquentQuery()->where('nik','like', "%$user->nik%");
+        // }
+        // {
+        //     return parent::getEloquentQuery();
+        // }
+
+        // return parent::getEloquentQuery()->where('nik','like', "$user->nik%");
     }
 
     public static function mutateFormDataBeforeCreate(array $data): array
@@ -95,7 +120,7 @@ class ActivitiResource extends Resource
     public static function canAccess(): bool
     {
         // dd(auth()->user()?->hasRole('super_admin'));
-        return auth()->user()?->hasRole(['super_admin','admin','teknisi']); // atau yang boleh saja
+        return auth()->user()?->hasRole(['super_admin','admin','teknisi','admincs']); // atau yang boleh saja
         // return auth()->user()->can('view lks');
     }
 
@@ -514,6 +539,10 @@ class ActivitiResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('kdcab')
+                    ->label('Cabang')
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('teknisi.nama')
                     ->label('Nama Teknisi')
                     ->sortable()
