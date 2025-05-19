@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Activiti extends Model
+
+class Activiti extends Model 
 {
+    // use LogsActivity;
     protected $table = 'activitis';
     protected $primaryKey = 'id';
     public $timestamps = true;
@@ -41,6 +45,16 @@ class Activiti extends Model
         'room_temperature',
         'kdcab',
     ];
+
+    use LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll(['kerusakan','solusi']) // log semua atribut
+            ->logOnlyDirty() // hanya log perubahan
+            ->setDescriptionForEvent(fn(string $eventName) => "Spk-Activiti - {$eventName}");
+    }
 
     protected $casts = [
         'tanggal_datang' => 'datetime',

@@ -137,28 +137,6 @@ class LksResource extends Resource
                                         ->required()
                                         ->dehydrateStateUsing(fn ($state) => strtoupper($state)),
                                 ]),                    
-                            // Select::make('pembuat_lks')
-                            //     ->label('Pembuat LKS')
-                            //     ->options([
-                            //         'ASSY BODY REFRI' => 'ASSY BODY REFRI',
-                            //         'ASSY CHI PRO' => 'ASSY CHI PRO',
-                            //         'ASSY SUPER JOB' => 'ASSY SUPER JOB',
-                            //         'QC INPROSES' => 'QC INPROSES',
-                            //         'REFRI COOLING' => 'REFRI COOLING',
-                            //         'WELDING KBL' => 'WELDING KBL',
-                            //     ])
-                            //     ->required(),
-                            // Select::make('penyebab_lks')
-                            //     ->label('Penyebab LKS')
-                            //     ->options([
-                            //         'MESIN BENDING' => 'MESIN BENDING',
-                            //         'MESIN PUNCHING' => 'MESIN PUNCHING',
-                            //         'PD' => 'PD',
-                            //         'QC INCOMING' => 'QC INCOMING',
-                            //         'WELDING SPOT' => 'WELDING SPOT',
-                            //         'WELDING SYSTEM' => 'WELDING SYSTEM',
-                            //     ])
-                            //     ->required(),
                         ]),
                     Grid::make(4)
                         ->schema([

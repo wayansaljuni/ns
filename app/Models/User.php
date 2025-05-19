@@ -6,6 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+/**
+ * @method bool hasRole(string $role)
+ * @method bool hasAnyRole(...$roles)
+ * @method \Spatie\Permission\Models\Role assignRole(...$roles)
+ */
+
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
