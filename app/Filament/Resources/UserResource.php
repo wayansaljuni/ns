@@ -55,7 +55,7 @@ public static function getEloquentQuery(): Builder
 
     public static function getNavigationBadge(): ?string
     {
-        return \App\Models\User::count();
+        return User::count();
     }
    
     public static function form(Form $form): Form
@@ -69,6 +69,7 @@ public static function getEloquentQuery(): Builder
                 ->disabled(fn () => !auth()->user()?->hasRole('super_admin')),
                 TextInput::make('nik')->label('NIK')->nullable(),
                 TextInput::make('kdcab')->label('Kode Cabang')->nullable(),
+                TextInput::make('kdun')->label('Kode Unit')->nullable(),
                 TextInput::make('password')
                     ->password()
                     ->dehydrateStateUsing(fn ($state) => !empty($state) ? bcrypt($state) : null)
@@ -87,6 +88,7 @@ public static function getEloquentQuery(): Builder
                 TextColumn::make('roles.name')->sortable()->searchable(),
                 TextColumn::make('nik')->label('Nik')->sortable()->searchable(),
                 TextColumn::make('kdcab')->label('Cabang')->sortable()->searchable(),               
+                TextColumn::make('kdun')->label('Unit')->sortable()->searchable(),               
             ])
             ->filters([
                 //

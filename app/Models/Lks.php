@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Lks extends Model
 {
@@ -31,7 +33,8 @@ class Lks extends Model
         'status',
         'user_id',
         'noseri',
-        'fileupload'
+        'fileupload',
+        'kdun'
     ];
 
     public function user()
@@ -56,6 +59,33 @@ class Lks extends Model
         {
             return $this->belongsTo(Mesin::class, 'mesin_id_penyebab');
         }
+    protected static function booted()
+    {
+        static::creating(function ($lks) {
+            if (Auth::check()) {
+                $lks->user_id = Auth::id();
+                $lks->kdun = Auth::user()->kdun;
+            }
+        });
+    }
+    public function scopeFilterByUserKdun(Builder $query): Builder
+    {
+        if (Auth::check()) {
+            $userKdun = Auth::user()->kdun;
 
+            if ($userKdun) {
+                return $query->where('kdun', $userKdun);
+            }
+        }
+
+        return $query; // Jika user tidak login atau kdun user kosong, tidak ada filter diterapkan
+        // $userKdun = Auth::user()->kdun;
+
+        // if ($userKdun) {
+        //     return $query->where('kdun', $userKdun);
+        // }
+
+        // return $query; // Jika kdun user kosong, tidak ada filter diterapkan
+    }
 
 }

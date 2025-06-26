@@ -51,7 +51,7 @@ class Activiti extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logAll(['kerusakan','solusi']) // log semua atribut
+            ->logAll() // log semua atribut
             ->logOnlyDirty() // hanya log perubahan
             ->setDescriptionForEvent(fn(string $eventName) => "Spk-Activiti - {$eventName}");
     }

@@ -2,37 +2,40 @@
 
 namespace App\Filament\Resources;
 
-use id;
 use Carbon\Carbon;
 use App\Models\Lks;
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\Mesin;
 use Filament\Forms\Form;
+// use Spatie\ImageOptimizer\Image;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-// use Spatie\ImageOptimizer\Image;
 use Filament\Forms\Components\Grid;
 use function Laravel\Prompts\select;
 use Illuminate\Support\Facades\Auth;
+
 use App\Filament\Exports\LksExporter;
 use Filament\Forms\Components\Hidden;
-
 use Filament\Forms\Components\Select;
 use Intervention\Image\Facades\Image;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Textarea;
+
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
-
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\LksResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\LksResource\RelationManagers;
 use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
+use Filament\Tables\Actions\Action;
+
 
 class LksResource extends Resource
 {
@@ -42,7 +45,9 @@ class LksResource extends Resource
     
     public static function getNavigationBadge(): ?string
     {
-        return (string) Lks::where('status', 'Open')->count();
+        return (string) Lks::where('status', 'Open')
+            ->where('kdun', Auth::user()->kdun)
+            ->count();
     }
     
     public static function getNavigationBadgeColor(): ?string
@@ -73,7 +78,13 @@ class LksResource extends Resource
     {
         // $data['user_id'] = auth()->id(); // otomatis isi user_id
         // return $data;
-        $data['user_id'] = Auth::user()->id;
+        // $data['user_id'] = Auth::user()->id;
+        // $data['kdun'] = Auth::user()->kdun;
+
+        $user = Auth::user();
+        $data['user_id'] = $user->id;
+        $data['kdun'] = $user->kdun;
+        // logger()->info('Creating activity:', $data); 
         return $data;
     }
     public static function canAccess(): bool
@@ -87,6 +98,11 @@ class LksResource extends Resource
         return $record->status == 'Open';
     }
 
+    public static function canView(Model $record): bool
+    {
+        return $record->status == 'Close';
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index'); // balik ke list
@@ -94,14 +110,59 @@ class LksResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->latest(); // urut berdasarkan created_at DESC
+        return parent::getEloquentQuery()
+            ->latest()// urut berdasarkan created_at DESC
+            ->FilterByUserKdun();
+            // ->where('kdun', 'like',Auth::user()->kdun); 
     }
-    
+// public static function getTableHeaderActions(): array
+// {
+//     return [
+//         Action::make('count-open')
+//             ->label('Open: ' . static::getModel()::where('status', 'open')->count())
+//             ->disabled()
+//             ->color('success'),
+
+//         Action::make('count-close')
+//             ->label('Close: ' . static::getModel()::where('status', 'close')->count())
+//             ->disabled()
+//             ->color('danger'),
+
+//         Action::make('count-all')
+//             ->label('All: ' . static::getModel()::count())
+//             ->disabled()
+//             ->color('gray'),
+//     ];
+// }
+
+    // public static function getTableFilters(): array
+    // {
+    //     return [
+    //         SelectFilter::make('status')
+    //             ->label('Status')
+    //             ->options([
+    //                 '' => 'All',
+    //                 'open' => 'Open',
+    //                 'close' => 'Close',
+    //             ])
+    //             ->default('') // default All
+    //             ->buttons() 
+    //             ->query(function ($query, $value) {
+    //                 if ($value) {
+    //                     return $query->where('status', $value);
+    //                 }
+
+    //                 return $query;
+    //             }),
+    //     ];
+    // }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Hidden::make('user_id')-> default(fn () => Auth::user()->id),
+                // Hidden::make('user_id')-> default(fn () => Auth::user()->id),
+                // Hidden::make('kdun')-> default(fn () => Auth::user()->kdun),
 
                 Fieldset::make('')
                 ->schema([
@@ -205,34 +266,23 @@ class LksResource extends Resource
                                 ->required(),
                         ]),        
                     FileUpload::make('fileupload')
-                        ->label('Attach File')
+                        ->label('Attach File -1')
                         ->image()
                         ->maxSize(10000) // Maksimal 10MB per file
                         ->directory('spk-activities/photos')
                         ->resize(50),
-                        // ->preserveFilenames()
-                        // ->afterStateUpdated(function ($state) {
-                        //     if (!$state) return;
-                        //     $path = storage_path('app/public/' . $state);
-                        //     if (!file_exists($path)) {
-                        //         logger("File not found at: " . $path);
-                        //         return;
-                        //     }
-                        //     if ($state) {
-                        //         $path = storage_path('app/public/' . $state);
-                        //         // Resize pakai Intervention Image
-                        //         $image = Image::make($path)
-                        //             ->resize(800, null, function ($constraint) {
-                        //                 $constraint->aspectRatio();
-                        //                 $constraint->upsize();
-                        //             })
-                        //             ->encode('jpg', 80); // Kompres kualitas
-                        //         $image->save($path); // Simpan hasil resize
-                        //         // Optimasi pakai Spatie Image Optimizer
-                        //         ImageOptimizer::optimize($path);
-                        //     }
-                        // }),
-    
+                    FileUpload::make('fileupload2')
+                        ->label('Attach File -2')
+                        ->image()
+                        ->maxSize(10000) // Maksimal 10MB per file
+                        ->directory('spk-activities/photos')
+                        ->resize(50),
+                    FileUpload::make('fileupload3')
+                        ->label('Attach File -3')
+                        ->image()
+                        ->maxSize(10000) // Maksimal 10MB per file
+                        ->directory('spk-activities/photos')
+                        ->resize(50),
 
                     Grid::make(2)
                     ->schema([
@@ -242,8 +292,7 @@ class LksResource extends Resource
                             ->required(),
                         Textarea::make('penyelesaian_permanen')
                             ->label('Penyelesaian Permanen')
-                            ->maxLength(200)
-                            ->required(),
+                            ->maxLength(200),
                     ]),        
 
 
@@ -252,11 +301,9 @@ class LksResource extends Resource
                 Grid::make(4)
                     ->schema([
                         DatePicker::make('target_selesai')
-                            ->label('Target Selesai')
-                            ->required(),
+                            ->label('Target Selesai'),
                         DatePicker::make('realisasi_selesai')
-                            ->label('Realisasi Selesai')
-                            ->required(),
+                            ->label('Realisasi Selesai'),
                         Select::make('pengulanganketidaksesuaian')
                                 ->label('Pengulangan LKS')
                                 ->options([
@@ -281,6 +328,16 @@ class LksResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Open' => 'warning',
+                        'Close' => 'success',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+
                 TextColumn::make('tanggal')
                     ->label('Weeks')
                     ->formatStateUsing(fn ($state) => 'M-' . Carbon::parse($state)->week)
@@ -335,7 +392,7 @@ class LksResource extends Resource
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('penyelesaian_permanen')
-                    ->label('Penyelesaian Pemanen')
+                    ->label('Penyelesaian Permanen')
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('target_selesai')
@@ -348,16 +405,6 @@ class LksResource extends Resource
                     ->sortable()
                     ->formatStateUsing(fn ($state) => 'M-' . Carbon::parse($state)->week)
                     ->searchable(),
-                TextColumn::make('status')
-                    ->label('Status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'No' => 'warning',
-                        'Yes' => 'success',
-                        default => 'gray',
-                    })
-                    ->sortable(),
-
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -365,7 +412,21 @@ class LksResource extends Resource
                     ->options([
                         'Open' => 'Open',
                         'Close' => 'Close',
-                    ]),
+                    ])
+                    ->searchable()
+                    ->preload()
+                    ->default(null)
+                    ->native(false), // ✅ agar tampil di header, bukan di menu filter                       
+
+                Tables\Filters\SelectFilter::make('mesin_id_penyebab')
+                    ->options(function () {
+                            return Mesin::pluck('nama', 'id')->toArray();
+                        })
+                    ->searchable()
+                    ->preload()
+                    ->default(null)
+                    ->native(false), // ✅ agar tampil di header, bukan di menu filter                       
+
                     
                 Tables\Filters\Filter::make('tanggal')
                     ->form([
@@ -398,11 +459,24 @@ class LksResource extends Resource
             ])
 
             ->headerActions([
+                Action::make('badge')
+                    ->label(function () {
+                        $model = static::getModel();
+
+                        $open = $model::where('status', 'open')->count();
+                        $close = $model::where('status', 'close')->count();
+                        $total = $model::count();
+
+                        return "🟢 Open: $open   🔴 Close: $close   📋 All: $total";
+                    })
+                    ->disabled()
+                    ->color('gray'),
+
                 ExportAction::make('export')
                     ->label('Export Excel')
                     ->color('gray')
                     ->exporter(LksExporter::class),
-                ])
+            ])
 
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

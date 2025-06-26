@@ -18,13 +18,17 @@ class SpkWidget extends BaseWidget
    
         if ($user->hasRole('lks')) {
             return [
-                Stat::make('LKS : Open', Lks::where('status','=', 'Open')->count())
+                Stat::make('LKS : Open', Lks::where('status','=', 'Open')
+                ->where('kdun','=',$user->kdun)
+                ->count())
                 ->description('Create Lks ?')
                 ->descriptionIcon('heroicon-o-wrench-screwdriver',IconPosition::Before)
                 ->url(route('filament.admin.resources.lks.create'))
                 ->Color('info'),
 
-                Stat::make('LKS : Closed', Lks::where('status', 'close')->count())
+                Stat::make('LKS : Closed', Lks::where('status', 'close')
+                ->where('kdun','=',$user->kdun)
+                ->count())
                 ->description('LKS Activities...')
                 ->descriptionIcon('heroicon-o-clipboard-document-list',IconPosition::Before)
                 ->url(route('filament.admin.resources.lks.index'))

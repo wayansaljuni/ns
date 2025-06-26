@@ -88,6 +88,7 @@ class ActivitiResource extends Resource
     {
         $user = Filament::auth()->user();
         // Jika super_admin, tampilkan semua user
+
         if ($user->hasRole(['super_admin'])) {
             return parent::getEloquentQuery();
         }
@@ -111,6 +112,11 @@ class ActivitiResource extends Resource
         // return parent::getEloquentQuery()->where('nik','like', "$user->nik%");
     }
 
+public static function getTableQuery(): Builder
+{
+    // return parent::getTableQuery()->with('teknisi','produk','spk');
+    return parent::getTableQuery();
+}    
     public static function mutateFormDataBeforeCreate(array $data): array
     {
         $data['nik'] = Auth::user()->nik;
@@ -472,7 +478,10 @@ class ActivitiResource extends Resource
                     ->label('Nama Teknisi')
                     ->sortable()
                     ->searchable(),
-                    
+                TextColumn::make('spk.nmcust')
+                    ->label('Nama Customer')
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('nospk')
                     ->label('No. SPK')
                     ->sortable()
